@@ -1,9 +1,14 @@
 /.cache/
 /src/
 /pkg/
+/bitwarden-electron/src/
+/bitwarden-electron/pkg/
 /dist/
 /*.deb
+/bitwarden-electron/*.deb
 /*.pkg.tar.*
 /*.src.tar.*
+/bitwarden-electron/*.pkg.tar.*
+/bitwarden-electron/*.src.tar.*
 /*.log
 /.DS_Store
