@@ -20,10 +20,10 @@ pkgbase = bitwarden-electron-bin
 	conflicts = bitwarden
 	conflicts = bitwarden-bin
 	conflicts = bitwarden-electron
-	noextract = bitwarden-electron-2026.9.0-3-x86_64.pkg.tar.zst
+	noextract = bitwarden-electron-2026.9.0-4-x86_64.tar.zst
 	options = !strip
 	options = !debug
-	source = https://github.com/fansion314/bitwarden/releases/download/v2026.9.0-3/bitwarden-electron-2026.9.0-3-x86_64.pkg.tar.zst
-	sha256sums = 43a7bb227e49d725045e525f04fae256cfe2fe00c701df28915e3f00b8e59687
+	source = https://github.com/fansion314/bitwarden/releases/download/v2026.9.0-4/bitwarden-electron-2026.9.0-4-x86_64.tar.zst
+	sha256sums = f4bff7bee477afe64a5aaac98878d33ce35e2d1690f9d6694845be51c2bb2d4e
 
 pkgname = bitwarden-electron-bin
