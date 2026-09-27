@@ -4,7 +4,7 @@
 # https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=bitwarden-bin
 pkgname=bitwarden-electron-bin
 pkgver=2026.9.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Bitwarden official binaries using the latest system Electron'
 arch=('x86_64')
 url='https://github.com/bitwarden/clients'
@@ -18,7 +18,7 @@ options=('!strip' '!debug')
 source=("https://github.com/bitwarden/clients/releases/download/desktop-v${pkgver}/Bitwarden-${pkgver}-amd64.deb"
         'bitwarden.sh')
 sha256sums=('51066f8fbaf4546626a2e77a9c0d3abfeef7a13685aca046cb30e07ebf3cf979'
-            'ab3640b93a4324178982add435f9b1559edc541638bb39c2bb1641a79024519a')
+            'ce273e03837cd5c5e69601f3b2af40f4004f4c710bf72950ba8f81d3235ff732')
 
 prepare() {
   mkdir -p upstream
@@ -42,9 +42,9 @@ if (JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8')).version 
 const file = path.join(dir, 'main.js');
 let text = fs.readFileSync(file, 'utf8');
 for (const [from, to] of [
-  ['execPath: electron_1.app.getPath("exe"),', 'execPath: "/usr/bin/bitwarden",'],
+  ['execPath: electron_1.app.getPath("exe"),', 'execPath: "/opt/Bitwarden/bitwarden",'],
   ['return path.join(path.dirname(this.exePath), `desktop_proxy${ext}`);',
-   'return "/usr/lib/bitwarden/desktop_proxy";'],
+   'return "/opt/Bitwarden/desktop_proxy";'],
 ]) {
   if (text.split(from).length !== 2) throw new Error(`Review upstream integration: ${from}`);
   text = text.replace(from, to);
@@ -63,15 +63,17 @@ check() {
 }
 
 package() {
-  local dest="$pkgdir/usr/lib/bitwarden"
+  local dest="$pkgdir/opt/Bitwarden"
   install -Dm644 app.asar "$dest/app.asar"
   cp -a app.asar.unpacked "$dest/"
   install -Dm755 upstream/opt/Bitwarden/desktop_proxy "$dest/desktop_proxy"
   install -Dm755 upstream/opt/Bitwarden/libprocess_isolation.so "$dest/libprocess_isolation.so"
-  install -Dm755 "$srcdir/bitwarden.sh" "$pkgdir/usr/bin/bitwarden"
-  ln -s bitwarden "$pkgdir/usr/bin/bitwarden-desktop"
+  install -Dm755 "$srcdir/bitwarden.sh" "$dest/bitwarden"
+  install -d "$pkgdir/usr/bin"
+  ln -s /opt/Bitwarden/bitwarden "$pkgdir/usr/bin/bitwarden"
+  ln -s /opt/Bitwarden/bitwarden "$pkgdir/usr/bin/bitwarden-desktop"
   install -Dm644 upstream/usr/share/applications/bitwarden.desktop \
     "$pkgdir/usr/share/applications/bitwarden.desktop"
-  sed -i 's|^Exec=.*|Exec=bitwarden %U|' "$pkgdir/usr/share/applications/bitwarden.desktop"
+  sed -i 's|^Exec=.*|Exec=/opt/Bitwarden/bitwarden %U|' "$pkgdir/usr/share/applications/bitwarden.desktop"
   cp -a upstream/usr/share/icons "$pkgdir/usr/share/"
 }

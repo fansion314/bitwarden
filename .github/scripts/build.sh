@@ -25,9 +25,12 @@ packages=("dist/${pkgname}-${version}-"*.pkg.tar.zst)
 sources=("dist/${pkgname}-${version}.src.tar.gz")
 [[ ${#packages[@]} == 1 && -f "${packages[0]}" && -f "${sources[0]}" ]]
 bsdtar -tf "${packages[0]}" > dist/package-files.txt
-grep -qx 'usr/lib/bitwarden/app.asar' dist/package-files.txt
+grep -qx 'opt/Bitwarden/app.asar' dist/package-files.txt
+grep -qx 'opt/Bitwarden/bitwarden' dist/package-files.txt
+grep -qx 'opt/Bitwarden/desktop_proxy' dist/package-files.txt
+grep -qx 'opt/Bitwarden/libprocess_isolation.so' dist/package-files.txt
 grep -qx 'usr/bin/bitwarden' dist/package-files.txt
-if grep -Eq '(^opt/|chrome-sandbox|resources\.pak|icudtl\.dat|hibernate|patch-app)' dist/package-files.txt; then
+if grep -Eq '(^usr/lib/bitwarden/|chrome-sandbox|resources\.pak|icudtl\.dat|hibernate|patch-app)' dist/package-files.txt; then
   echo 'Unexpected bundled runtime or removed patch files in package.' >&2
   exit 1
 fi
@@ -47,6 +50,7 @@ Repackages the official Bitwarden Desktop ${pkgver} Linux x86_64 release using A
 
 Install the package with \`sudo pacman -U ${pkgname}-${version}-x86_64.pkg.tar.zst\`.
 The \`electron\` dependency follows Arch's latest stable Electron package.
+Application files are installed under \`/opt/Bitwarden\`; commands in \`/usr/bin\` are symlinks.
 Window closing, tray behavior, and SSH authorization remain upstream behavior.
 
 Assets include the Arch package, makepkg source archive, SHA-256 checksums, package file list, and build environment versions.
