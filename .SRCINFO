@@ -1,7 +1,7 @@
 pkgbase = bitwarden-electron-bin
-	pkgdesc = Bitwarden using system Electron (prebuilt package)
+	pkgdesc = Bitwarden using system Electron (prebuilt application)
 	pkgver = 2026.9.0
-	pkgrel = 3
+	pkgrel = 4
 	url = https://github.com/fansion314/bitwarden
 	arch = x86_64
 	license = GPL-3.0-only

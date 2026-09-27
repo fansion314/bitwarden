@@ -1,9 +1,9 @@
-# Download this repository's prebuilt system-Electron package.
+# Download this repository's preprocessed system-Electron application archive.
 # No upstream DEB extraction, ASAR processing, or application build is performed.
 pkgname=bitwarden-electron-bin
 pkgver=2026.9.0
-pkgrel=3
-pkgdesc='Bitwarden using system Electron (prebuilt package)'
+pkgrel=4
+pkgdesc='Bitwarden using system Electron (prebuilt application)'
 arch=('x86_64')
 url='https://github.com/fansion314/bitwarden'
 license=('GPL-3.0-only')
@@ -20,6 +20,6 @@ noextract=("$_archive")
 sha256sums=('43a7bb227e49d725045e525f04fae256cfe2fe00c701df28915e3f00b8e59687')
 
 package() {
-  # Copy only installed payload, excluding the input package's pacman metadata.
+  # Package the prepared application files; makepkg supplies pacman metadata.
   bsdtar -xf "$srcdir/$_archive" -C "$pkgdir" opt usr
 }

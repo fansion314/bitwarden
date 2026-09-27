@@ -1,4 +1,4 @@
-// Generate a standalone -bin recipe pinned to a package just built by CI.
+// Pin the -bin recipe to the single application archive produced by CI.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -8,8 +8,8 @@ if (!/^\d[\w.+]*$/.test(version) || !/^\d+$/.test(release)) {
   throw new Error('Invalid package version or release');
 }
 const name = basename(archive);
-if (name !== `bitwarden-electron-${version}-${release}-x86_64.pkg.tar.zst`) {
-  throw new Error(`Unexpected prebuilt package name: ${name}`);
+if (name !== `bitwarden-electron-${version}-${release}-x86_64.tar.zst`) {
+  throw new Error(`Unexpected application archive name: ${name}`);
 }
 const digest = createHash('sha256').update(readFileSync(archive)).digest('hex');
 let text = readFileSync(template, 'utf8');

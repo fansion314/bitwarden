@@ -1,4 +1,4 @@
-name: Build and release Arch packages
+name: Build AUR application archive
 
 on:
   push:
@@ -42,7 +42,7 @@ jobs:
           chown -R builder:builder "$GITHUB_WORKSPACE"
           runuser -u builder -- bash .github/scripts/build.sh
           printf 'tag=%s\n' "$(cat dist/tag.txt)" >> "$GITHUB_OUTPUT"
-      - name: Store release artifacts
+      - name: Store application archive and internal metadata
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: arch-package
@@ -75,7 +75,9 @@ jobs:
           set -euo pipefail
           cd dist
           sha256sum --check SHA256SUMS
-          assets=(*.pkg.tar.zst *.src.tar.gz SHA256SUMS build-info.txt package-files.txt)
+          assets=(release/*.tar.zst)
+          [[ ${#assets[@]} == 1 && -f "${assets[0]}" ]]
+          [[ $(find release -mindepth 1 -maxdepth 1 | wc -l) -eq 1 ]]
           if gh release view "$TAG" --json isDraft > release.json 2>/dev/null; then
             draft=$(jq -r .isDraft release.json)
             if [[ "$draft" == true ]]; then
@@ -98,6 +100,7 @@ jobs:
               --notes-file release-notes.md --draft
           fi
           gh release edit "$TAG" --draft=false --latest
+          [[ $(gh release view "$TAG" --json assets --jq '.assets | length') == 1 ]]
           gh release view "$TAG" --json url --jq .url >> "$GITHUB_STEP_SUMMARY"
       - name: Update the download-only recipe after publication
         shell: bash
@@ -105,7 +108,7 @@ jobs:
           set -euo pipefail
           git fetch origin main
           if [[ $(git rev-parse origin/main) != "$GITHUB_SHA" ]]; then
-            echo 'main has advanced; keep the newer recipe and use the versioned source archive.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'main has advanced; keep the newer recipe rather than overwrite it.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           cp dist/bin-recipe/PKGBUILD PKGBUILD
