@@ -13,11 +13,11 @@ provides=("bitwarden=$pkgver" "bitwarden-electron=$pkgver")
 conflicts=('bitwarden' 'bitwarden-bin' 'bitwarden-electron')
 options=('!strip' '!debug')
 # Independently pin the published input: pkgrel can change without rebuilding it.
-_release='2026.9.0-2'
-_archive='bitwarden-electron-bin-2026.9.0-2-x86_64.pkg.tar.zst'
+_release='2026.9.0-3'
+_archive='bitwarden-electron-2026.9.0-3-x86_64.pkg.tar.zst'
 source=("https://github.com/fansion314/bitwarden/releases/download/v${_release}/${_archive}")
 noextract=("$_archive")
-sha256sums=('41f33f578fad129b22b020d2f9fe026c13799ff661cfa5f4c580354b562e073c')
+sha256sums=('43a7bb227e49d725045e525f04fae256cfe2fe00c701df28915e3f00b8e59687')
 
 package() {
   # Copy only installed payload, excluding the input package's pacman metadata.
