@@ -1,0 +1,9 @@
+/.cache/
+/src/
+/pkg/
+/dist/
+/*.deb
+/*.pkg.tar.*
+/*.src.tar.*
+/*.log
+/.DS_Store
