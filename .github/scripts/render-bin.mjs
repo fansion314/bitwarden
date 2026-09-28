@@ -8,7 +8,7 @@ if (!/^\d[\w.+]*$/.test(version) || !/^\d+$/.test(release)) {
   throw new Error('Invalid package version or release');
 }
 const name = basename(archive);
-if (name !== `bitwarden-electron-${version}-${release}-x86_64.tar.zst`) {
+if (name !== `bitwarden-electron-${version}-${release}-x86_64.pkg.tar.zst`) {
   throw new Error(`Unexpected application archive name: ${name}`);
 }
 const digest = createHash('sha256').update(readFileSync(archive)).digest('hex');

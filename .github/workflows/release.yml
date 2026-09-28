@@ -75,7 +75,7 @@ jobs:
           set -euo pipefail
           cd dist
           sha256sum --check SHA256SUMS
-          assets=(release/*.tar.zst)
+          assets=(release/*.pkg.tar.zst)
           [[ ${#assets[@]} == 1 && -f "${assets[0]}" ]]
           [[ $(find release -mindepth 1 -maxdepth 1 | wc -l) -eq 1 ]]
           if gh release view "$TAG" --json isDraft > release.json 2>/dev/null; then

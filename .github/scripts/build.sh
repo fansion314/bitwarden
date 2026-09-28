@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build in Arch as an ordinary user. Only the application archive is published.
+# Build in Arch as an ordinary user. Publish the verified pacman package.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 root=$PWD
@@ -14,7 +14,6 @@ for recipe in . bitwarden-electron; do
   (cd "$recipe" && makepkg --printsrcinfo) > "$work/SRCINFO.generated"
   diff -u "$recipe/.SRCINFO" "$work/SRCINFO.generated"
 done
-# makepkg products are intermediate validation artifacts, not Release assets.
 export PKGDEST="$work/packages"
 mkdir -p "$PKGDEST"
 (
@@ -28,20 +27,19 @@ version="${pkgver}-${pkgrel}"
 printf 'v%s\n' "$version" > dist/tag.txt
 package="$PKGDEST/${pkgname}-${version}-x86_64.pkg.tar.zst"
 [[ -f "$package" ]]
-mkdir "$work/payload"
-bsdtar -xf "$package" -C "$work/payload" opt usr
-archive="$root/dist/release/bitwarden-electron-${version}-x86_64.tar.zst"
-bsdtar --uid 0 --gid 0 --uname root --gname root --zstd \
-  -cf "$archive" -C "$work/payload" opt usr
+archive="$root/dist/release/bitwarden-electron-${version}-x86_64.pkg.tar.zst"
+cp "$package" "$archive"
 bsdtar -tf "$archive" > "$work/archive-files.txt"
-for entry in opt/Bitwarden/app.asar opt/Bitwarden/bitwarden \
-             opt/Bitwarden/desktop_proxy opt/Bitwarden/libprocess_isolation.so usr/bin/bitwarden; do
+for entry in usr/lib/bitwarden-electron/app.asar usr/lib/bitwarden-electron/bitwarden \
+             usr/lib/bitwarden-electron/desktop_proxy usr/lib/bitwarden-electron/libprocess_isolation.so usr/bin/bitwarden; do
   grep -qx "$entry" "$work/archive-files.txt"
 done
-if grep -Eq '(^\.|^usr/lib/bitwarden/|chrome-sandbox|resources\.pak|icudtl\.dat|hibernate|patch-app)' "$work/archive-files.txt"; then
-  echo 'Unexpected package metadata or bundled runtime in application archive.' >&2
+if grep -Eq '(^opt/|chrome-sandbox|resources\.pak|icudtl\.dat|hibernate|patch-app)' "$work/archive-files.txt"; then
+  echo 'Unexpected install path or bundled runtime in package.' >&2
   exit 1
 fi
+mkdir "$work/payload"
+bsdtar -xf "$archive" -C "$work/payload" usr
 
 # Exercise the AUR download recipe against the exact archive to be published.
 bin_dir="$work/bin-recipe"
@@ -53,7 +51,7 @@ ln -s "$archive" "$bin_dir/$(basename "$archive")"
   makepkg --cleanbuild --force --noconfirm
 )
 mkdir "$work/bin-payload"
-bsdtar -xf "$PKGDEST/bitwarden-electron-bin-${version}-x86_64.pkg.tar.zst" -C "$work/bin-payload" opt usr
+bsdtar -xf "$PKGDEST/bitwarden-electron-bin-${version}-x86_64.pkg.tar.zst" -C "$work/bin-payload" usr
 diff -qr --no-dereference "$work/payload" "$work/bin-payload"
 mkdir -p dist/bin-recipe
 cp "$bin_dir/PKGBUILD" "$bin_dir/.SRCINFO" dist/bin-recipe/
@@ -67,9 +65,9 @@ cp "$bin_dir/PKGBUILD" "$bin_dir/.SRCINFO" dist/bin-recipe/
 )
 digest=$(sha256sum "$archive" | cut -d ' ' -f 1)
 cat > dist/release-notes.md <<EOF
-Prepared Bitwarden Desktop ${pkgver} application files for the \`bitwarden-electron-bin\` AUR recipe.
+Prepared Bitwarden Desktop ${pkgver} pacman package and \`bitwarden-electron-bin\` AUR recipe.
 
-The single archive contains the application payload for \`/opt/Bitwarden\` and desktop integration files. It contains no Electron runtime or pacman package metadata. Install through the AUR recipe, which supplies the system Electron dependency and creates the Arch package locally.
+The package installs application files under \`/usr/lib/bitwarden-electron\` with desktop integration and depends on system Electron. Download the \`.pkg.tar.zst\` asset and install with \`pacman -U\`. The AUR recipe still runs \`makepkg\` and repackages the payload.
 
 \`bitwarden-electron\` remains the alternative recipe that extracts the official upstream release locally.
 
