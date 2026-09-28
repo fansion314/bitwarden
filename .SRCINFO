@@ -24,6 +24,6 @@ pkgbase = bitwarden-electron-bin
 	options = !strip
 	options = !debug
 	source = https://github.com/fansion314/bitwarden/releases/download/v2026.9.0-5/bitwarden-electron-2026.9.0-5-x86_64.pkg.tar.zst
-sha256sums = SKIP
+	sha256sums = SKIP
 
 pkgname = bitwarden-electron-bin
