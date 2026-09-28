@@ -17,7 +17,7 @@ _release='2026.9.0-5'
 _archive='bitwarden-electron-2026.9.0-5-x86_64.pkg.tar.zst'
 source=("https://github.com/fansion314/bitwarden/releases/download/v${_release}/${_archive}")
 noextract=("$_archive")
-sha256sums=('SKIP')
+sha256sums=('511bc9068eeb062cc1814b95a45ece84035e83e0489fe53aa24c3a989dd400c7')
 
 package() {
   # The release asset can also be installed directly with pacman -U.
